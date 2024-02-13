@@ -21,6 +21,8 @@ pipeline {
         
         stage('Deploy') {
             steps {
+                    bat 'docker ps -a | grep my-node-app | awk \'{print $1}\' | xargs -I {} docker stop {}'
+                    bat 'docker ps -a | grep my-node-app | awk \'{print $1}\' | xargs -I {} docker rm {}'
                 // Deploy the Docker container
                 bat 'docker run -d -p 3000:3000 my-node-app'
             }
