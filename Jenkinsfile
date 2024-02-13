@@ -21,8 +21,8 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                    bat 'docker ps -a | grep my-node-app | awk \'{print $1}\' | xargs -I {} docker stop {}'
-                    bat 'docker ps -a | grep my-node-app | awk \'{print $1}\' | xargs -I {} docker rm {}'
+                     bat 'docker ps -a | Select-String -Pattern "my-node-app" | ForEach-Object { docker stop $_.Matches.Groups[0].Value }'
+                    bat 'docker ps -a | Select-String -Pattern "my-node-app" | ForEach-Object { docker rm $_.Matches.Groups[0].Value }'
                 // Deploy the Docker container
                 bat 'docker run -d -p 3000:3000 my-node-app'
             }
