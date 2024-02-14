@@ -25,7 +25,7 @@ pipeline {
                     bat 'docker rm my-node-app'
                  
                 // Deploy the Docker container
-                bat 'docker run -d -p 3000:3000 my-node-app'
+                bat 'docker run --name my-node-app -d -p 3000:3000 my-node-app'
             }
         }
     }
