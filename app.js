@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send('Testing Jenkins pipeline from windows system');
+  res.send('Testing Jenkins pipeline from windows');
 });
 
 const PORT = process.env.PORT || 3000;
