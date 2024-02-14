@@ -25,7 +25,8 @@ pipeline {
                     sh 'docker rm my-node-app'
                  
                 // Deploy the Docker container
-                sh 'docker run --name my-node-app -d -p 3000:3000 my-node-app'
+                sh 'docker run --name my-node-app -d -p 3000:3000 -v 
+/home1/volume:/app/data my-node-app'
             }
         }
     }

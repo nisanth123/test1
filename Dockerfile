@@ -18,3 +18,6 @@ EXPOSE 3000
 
 # Command to run the application
 CMD ["node", "app.js"]
+
+# Add a volume for data persistence
+VOLUME /app/data
