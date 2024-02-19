@@ -1,6 +1,8 @@
 pipeline {
     agent any
-    
+    environment {     
+        DOCKERHUB_CREDENTIALS= credentials('dockerhub')     
+    } 
     stages {
         stage('Build') {
             steps {
@@ -8,24 +10,33 @@ pipeline {
                 checkout scm
                 
                 // Build Docker image
-                sh 'docker build -t my-node-app .'
+                script {
+                    docker.build('nisanthp/my-node-app')
+                }
+            }
+        }
+        
+        stage('Push Image to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR')]) {
+                    sh "docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
+                }
+                sh 'docker push nisanthp/my-node-app'
             }
         }
         
         stage('Test') {
             steps {
                 // You can add your test scripts here
-                sh 'echo "Running tests"ufw'
+                sh 'echo "Running tests"'
             }
         }
         
         stage('Deploy') {
             steps {
-                    sh 'docker stop my-node-app'
-                    sh 'docker rm my-node-app'
-                 
-                // Deploy the Docker container
-                sh 'docker run --name my-node-app -d -p 3000:3000 -v /home1/volume:/app/data my-node-app'
+                // Apply Kubernetes deployment and service YAML files
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
             }
         }
     }
