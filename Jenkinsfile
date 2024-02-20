@@ -3,21 +3,6 @@ pipeline {
     environment {     
         DOCKERHUB_CREDENTIALS= credentials('dockerhub')     
     } 
-    kubernetes {
-            defaultContainer 'jnlp'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    some-label: some-label-value
-spec:
-  serviceAccountName: jenkins
-  containers:
-  - name: jnlp
-    image: jenkins/jnlp-slave
-            """
-        }
     stages {
         stage('Build') {
             steps {
