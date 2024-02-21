@@ -10,8 +10,8 @@ pipeline {
                 app: my-node-app
             spec:
               containers:
-                - name: maven
-                  image: maven:3.8.4-jdk-11
+                - name: my-node-app
+                  image: nisanthp/my-node-app
                   command:
                     - cat
                   tty: true
@@ -30,9 +30,8 @@ pipeline {
                 // Checkout the code from the repository
                 checkout scm
 
-                // Build Docker image
                 script {
-                    sh "mvn clean package" // Or any other Maven commands you need
+                    docker.build('nisanthp/my-node-app')
                 }
             }
         }
@@ -55,7 +54,7 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                container('maven') {
+                container('kubernetes') {
                     sh 'kubectl apply -f deployment.yaml'
                     sh 'kubectl apply -f service.yaml'
                 }
