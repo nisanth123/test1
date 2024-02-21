@@ -10,8 +10,8 @@ pipeline {
                 app: my-node-app
             spec:
               containers:
-                - name: my-node-app
-                  image: nisanthp/my-node-app
+                - name: maven
+                  image: maven:3.8.4-jdk-11
                   command:
                     - cat
                   tty: true
@@ -19,9 +19,10 @@ pipeline {
         }
     }
 
-    environment {     
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
-    } 
+    environment {
+        NAME = 'SERVICE_ACCOUNT_NAME'
+        VALUE = 'jenkins-kube' // Replace with your actual name
+    }
 
     stages {
         stage('Build') {
@@ -54,11 +55,7 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                container('kubernetes') {
-                    environment {
-                        NAME = 'SERVICE_ACCOUNT_NAME'
-                        VALUE = 'jenkins-kube' // Replace with your actual name
-                    }
+                container('maven') {
                     sh 'kubectl apply -f deployment.yaml'
                     sh 'kubectl apply -f service.yaml'
                 }
