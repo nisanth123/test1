@@ -38,8 +38,8 @@ pipeline {
             }
             steps {
                 container('kubernetes') {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
+                   sh 'kubectl --context kind-kind apply -f deployment.yaml'
+                    sh 'kubectl --context kind-kind apply service.yaml'
                 }
             }
         }
