@@ -1,15 +1,14 @@
 pipeline {
     agent any
+
     environment {     
-        DOCKERHUB_CREDENTIALS= credentials('dockerhub')     
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
     } 
+
     stages {
         stage('Build') {
             steps {
-                // Checkout the code from the repository
                 checkout scm
-                
-                // Build Docker image
                 script {
                     docker.build('nisanthp/my-node-app')
                 }
@@ -27,22 +26,22 @@ pipeline {
         
         stage('Test') {
             steps {
-                // You can add your test scripts here
                 sh 'echo "Running tests"'
+                // You can add your test scripts here
             }
         }
         
         stage('Deploy') {
-           steps {
-             container('kubernetes') {
-                 environment {
-                   NAME = 'SERVICE_ACCOUNT_NAME'
-                   VALUE = 'jenkins-kube' // Replace with your actual name
-          }
-               sh 'kubectl apply -f deployment.yaml'
-               sh 'kubectl apply -f service.yaml'
-        }
-      }
+            steps {
+                container('kubernetes') {
+                    environment {
+                        NAME = 'SERVICE_ACCOUNT_NAME'
+                        VALUE = 'jenkins-kube' // Replace with your actual name
+                    }
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
+                }
+            }
         }
     }
 }
