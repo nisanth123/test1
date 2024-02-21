@@ -31,7 +31,7 @@ pipeline {
                 checkout scm
 
                 script {
-                    docker.build('nisanthp/my-node-app')
+                    sh 'docker build -t nisanthp/my-node-app .'
                 }
             }
         }
