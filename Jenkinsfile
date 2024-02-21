@@ -32,12 +32,12 @@ pipeline {
         }
         
         stage('Deploy') {
+            environment {
+                NAME = 'SERVICE_ACCOUNT_NAME'
+                VALUE = 'jenkins-kube' // Replace with your actual name
+            }
             steps {
                 container('kubernetes') {
-                    environment {
-                        NAME = 'SERVICE_ACCOUNT_NAME'
-                        VALUE = 'jenkins-kube' // Replace with your actual name
-                    }
                     sh 'kubectl apply -f deployment.yaml'
                     sh 'kubectl apply -f service.yaml'
                 }
