@@ -35,10 +35,10 @@ pipeline {
         
         stage('Deploy') {
             steps {
-               //container('kubernetes')
+               container('kubernetes') {
                    sh 'kubectl --context kind-kind apply -f deployment.yaml'
                     sh 'kubectl --context kind-kind apply service.yaml'
-                
+               }
             }
         }
     }
