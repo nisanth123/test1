@@ -3,6 +3,8 @@ pipeline {
 
     environment {     
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
+        NAME = 'SERVICE_ACCOUNT_NAME'
+        VALUE = 'jenkins-kube' // Replace with your actual name
     } 
 
     stages {
@@ -32,15 +34,11 @@ pipeline {
         }
         
         stage('Deploy') {
-            environment {
-                NAME = 'SERVICE_ACCOUNT_NAME'
-                VALUE = 'jenkins-kube' // Replace with your actual name
-            }
             steps {
-                container('kubernetes') {
+               //container('kubernetes')
                    sh 'kubectl --context kind-kind apply -f deployment.yaml'
                     sh 'kubectl --context kind-kind apply service.yaml'
-                }
+                
             }
         }
     }
