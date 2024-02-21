@@ -1,37 +1,16 @@
 pipeline {
-    agent {
-        kubernetes {
-            // Define the Maven pod template
-            yaml """
-            apiVersion: v1
-            kind: Pod
-            metadata:
-              labels:
-                app: my-node-app
-            spec:
-              containers:
-                - name: my-node-app
-                  image: nisanthp/my-node-app
-                  command:
-                    - cat
-                  tty: true
-            """
-        }
-    }
+    agent any
 
-    environment {
-        NAME = 'SERVICE_ACCOUNT_NAME'
-        VALUE = 'jenkins-kube' // Replace with your actual name
-    }
+    environment {     
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
+    } 
 
     stages {
         stage('Build') {
             steps {
-                // Checkout the code from the repository
                 checkout scm
-
                 script {
-                    sh 'docker build -t nisanthp/my-node-app .'
+                    docker.build('nisanthp/my-node-app')
                 }
             }
         }
@@ -47,16 +26,20 @@ pipeline {
         
         stage('Test') {
             steps {
-                // You can add your test scripts here
                 sh 'echo "Running tests"'
+                // You can add your test scripts here
             }
         }
         
         stage('Deploy') {
+            environment {
+                NAME = 'SERVICE_ACCOUNT_NAME'
+                VALUE = 'jenkins-kube' // Replace with your actual name
+            }
             steps {
                 container('kubernetes') {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
+                   sh 'kubectl --context kind-kind apply -f deployment.yaml'
+                    sh 'kubectl --context kind-kind apply service.yaml'
                 }
             }
         }
