@@ -1,5 +1,23 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            // Define the Maven pod template
+            yaml """
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: my-node-app
+            spec:
+              containers:
+                - name: my-node-app
+                  image: nisanthp/my-node-app
+                  command:
+                    - cat
+                  tty: true
+            """
+        }
+    }
 
     environment {     
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
@@ -8,9 +26,12 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                // Checkout the code from the repository
                 checkout scm
+
+                // Build Docker image
                 script {
-                    docker.build('nisanthp/my-node-app')
+                    sh "mvn clean package" // Or any other Maven commands you need
                 }
             }
         }
@@ -26,20 +47,20 @@ pipeline {
         
         stage('Test') {
             steps {
-                sh 'echo "Running tests"'
                 // You can add your test scripts here
+                sh 'echo "Running tests"'
             }
         }
         
         stage('Deploy') {
-            environment {
-                NAME = 'SERVICE_ACCOUNT_NAME'
-                VALUE = 'jenkins-kube' // Replace with your actual name
-            }
             steps {
                 container('kubernetes') {
-                   sh 'kubectl --context kind-kind apply -f deployment.yaml'
-                    sh 'kubectl --context kind-kind apply service.yaml'
+                    environment {
+                        NAME = 'SERVICE_ACCOUNT_NAME'
+                        VALUE = 'jenkins-kube' // Replace with your actual name
+                    }
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
                 }
             }
         }
