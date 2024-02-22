@@ -41,7 +41,7 @@ pipeline {
                     // Use Kubernetes credentials
                     withKubeConfig(credentialsId: 'kube_config') {
                         // Create Kubernetes deployment
-                        sh "kubectl apply -f deployment.yaml'
+                        sh 'kubectl apply -f deployment.yaml'
                         sh 'kubectl apply -f service.yaml'
                     }
                 }
