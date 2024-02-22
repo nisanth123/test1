@@ -8,6 +8,7 @@ pipeline {
         K8S_NAMESPACE = 'default'
         // Set your Kubernetes deployment name
         K8S_DEPLOYMENT_NAME = 'my-node-app'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
@@ -24,8 +25,9 @@ pipeline {
                     docker.build("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}")
                 }
                 // Push Docker image to registry
-                script {
-                    docker.withRegistry("${DOCKER_REGISTRY}", 'dockerhub') {
+                steps {
+                       withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR')]) {
+                       sh "docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
                         docker.image("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}").push()
                     }
                 }
