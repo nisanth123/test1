@@ -9,6 +9,7 @@ pipeline {
         // Set your Kubernetes deployment name
         K8S_DEPLOYMENT_NAME = 'my-node-app'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        KUBE_CONFIG = credentials('kube_config')
     }
 
     stages {
@@ -36,10 +37,13 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Update Kubernetes deployment with the new image
                 script {
-                    sh "kubectl set image deployment/${K8S_DEPLOYMENT_NAME} ${K8S_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER} -n ${K8S_NAMESPACE}"
+                    withKubeConfig(credentialsId: 'kube_config') {
+                // Update Kubernetes deployment with the new image
+                script {             
+                   sh "kubectl set image deployment/${K8S_DEPLOYMENT_NAME} ${K8S_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER} -n ${K8S_NAMESPACE}"
                 }
+                    }
             }
         }
     }
