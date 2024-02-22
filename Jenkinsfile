@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Set the Docker registry where your images will be pushed
-        DOCKER_REGISTRY = 'https://hub.docker.com/repositories/nisanthp'
+        DOCKER_REGISTRY = 'https://hub.docker.com'
         // Set your Kubernetes namespace
         K8S_NAMESPACE = 'default'
         // Set your Kubernetes deployment name
