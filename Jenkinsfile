@@ -4,7 +4,7 @@ pipeline {
     environment {     
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
         NAME = 'SERVICE_ACCOUNT_NAME'
-        VALUE = 'jenkins-kube' // Replace with your actual name
+        VALUE = 'jenkins' // Replace with your actual name
     } 
 
     stages {
