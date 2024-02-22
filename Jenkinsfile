@@ -13,10 +13,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Checkout your Node.js application code from your version control system
-                git 'your-nodejs-app-repository-url'
-                // Install dependencies
-                sh 'npm install'
+            checkout scm
             }
         }
 
