@@ -26,7 +26,7 @@ pipeline {
                 // Push Docker image to registry
                 script {
                     docker.withRegistry("${DOCKER_REGISTRY}", 'dockerhub') {
-                        docker.image("${DOCKER_REGISTRY}/your-nodejs-app:${env.BUILD_NUMBER}").push()
+                        docker.image("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}").push()
                     }
                 }
             }
