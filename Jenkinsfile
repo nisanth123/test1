@@ -1,45 +1,56 @@
 pipeline {
     agent any
 
-    environment {     
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')     
-        NAME = 'SERVICE_ACCOUNT_NAME'
-        VALUE = 'jenkins' // Replace with your actual name
-    } 
+    environment {
+        // Set the Docker registry where your images will be pushed
+        DOCKER_REGISTRY = 'https://hub.docker.com/repositories/nisanthp'
+        // Set your Kubernetes namespace
+        K8S_NAMESPACE = 'default'
+        // Set your Kubernetes deployment name
+        K8S_DEPLOYMENT_NAME = 'my-node-app'
+    }
 
     stages {
         stage('Build') {
             steps {
-                checkout scm
+                // Checkout your Node.js application code from your version control system
+                git 'your-nodejs-app-repository-url'
+                // Install dependencies
+                sh 'npm install'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                // Build Docker image
                 script {
-                    docker.build('nisanthp/my-node-app')
+                    docker.build("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}")
+                }
+                // Push Docker image to registry
+                script {
+                    docker.withRegistry("${DOCKER_REGISTRY}", 'dockerhub') {
+                        docker.image("${DOCKER_REGISTRY}/your-nodejs-app:${env.BUILD_NUMBER}").push()
+                    }
                 }
             }
         }
-        
-        stage('Push Image to Docker Hub') {
+
+        stage('Deploy to Kubernetes') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR')]) {
-                    sh "docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
+                // Update Kubernetes deployment with the new image
+                script {
+                    sh "kubectl set image deployment/${K8S_DEPLOYMENT_NAME} ${K8S_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER} -n ${K8S_NAMESPACE}"
                 }
-                sh 'docker push nisanthp/my-node-app'
             }
         }
-        
-        stage('Test') {
-            steps {
-                sh 'echo "Running tests"'
-                // You can add your test scripts here
-            }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
         }
-        
-        stage('Deploy') {
-            steps {
-              container('kubernetes') {
-                   sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
-               }
-            }
+        failure {
+            echo 'Deployment failed!'
         }
     }
 }
