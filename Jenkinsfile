@@ -40,6 +40,18 @@ pipeline {
                 script {
                     // Use Kubernetes credentials
                     withKubeConfig(credentialsId: 'kube_config') {
+                        // Create Kubernetes deployment
+                        sh "kubectl create deployment ${K8S_DEPLOYMENT_NAME} --image=${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER} -n ${K8S_NAMESPACE}"
+                    }
+                }
+            }
+        }
+
+        stage('Update Deployment Image') {
+            steps {
+                script {
+                    // Use Kubernetes credentials
+                    withKubeConfig(credentialsId: 'kube_config') {
                         // Update Kubernetes deployment with the new image
                         sh "kubectl set image deployment/${K8S_DEPLOYMENT_NAME} ${K8S_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER} -n ${K8S_NAMESPACE}"
                     }
