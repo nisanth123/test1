@@ -25,9 +25,10 @@ pipeline {
                     docker.build("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}")
                 }
                 // Push Docker image to registry
-                steps {
+                script {
                        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR')]) {
                        sh "docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
+                       }
                         docker.image("${DOCKER_REGISTRY}/my-node-app:${env.BUILD_NUMBER}").push()
                     }
                 }
