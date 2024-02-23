@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+       label 'windows'
+    }
 
     environment {
         // Set the Docker registry where your images will be pushed
